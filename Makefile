@@ -17,13 +17,19 @@ OBJS = \
 	src/main.o
 TARGET = qrscan
 
-.PHONY: all clean
+.PHONY: all install uninstall clean
 
 all: $(OBJS)
 	$(CC) $^ $(LDFLAGS) -o $(TARGET)
 
 .c.o:
 	$(CC) $< $(CFLAGS) -o $@
+
+install:
+	install -o root -g root -m 0755 $(TARGET) $(PREFIX)/bin
+
+uninstall:
+	rm -f $(PREFIX)/bin/$(TARGET)
 
 clean:
 	rm -f $(OBJS)
