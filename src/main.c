@@ -3,15 +3,13 @@
 #include <stdio.h>
 
 #include <png.h>
-#include <quirc.h>
 
+#include "helpers.h"
 #include "options.h"
+#include "qrcode.h"
 
 #define PNG_RGB_TO_GRAY_RED_COEFFICIENT 0.299
 #define PNG_RGB_TO_GRAY_GREEN_COEFFICIENT 0.587
-
-typedef char *String;
-typedef FILE *File;
 
 typedef struct _Image {
     String filename;
@@ -27,7 +25,6 @@ typedef struct _Image {
     png_bytepp pointers;
 } *Image;
 
-typedef struct quirc *QRCode;
 
 Image Image_new(String filename) {
     Image this = (Image) calloc(sizeof(struct _Image), 1);
@@ -86,61 +83,20 @@ void Image_delete(Image this) {
     }
 }
 
-QRCode QRCode_new(Image image) {
-    QRCode this = quirc_new();
+int main(int argc, String argv[]) {
+    Options options = options_new(argc, argv);
+    Image image = Image_new(options->filename);
+    QRCode qrcode = qrcode_new();
 
-    if (quirc_resize(this, image->width, image->height) < 0) {
-        panic("Failed to allocate video memory\n");
-    }
-
-    uint8_t *pixels = quirc_begin(this, NULL, NULL);
+    ByteArray pixels = qrcode_alloc(qrcode, image->width, image->height);
     for (int y = 0; y < image->height; y++) {
         image->pointers[y] = pixels + y * image->width;
     }
     png_read_image(image->png, image->pointers);
-    quirc_end(this);
 
-    return this;
-}
+    qrcode_scan(qrcode);
 
-void QRCode_delete(QRCode this) {
-    quirc_destroy(this);
-}
-
-int QRCode_count(QRCode this) {
-    return quirc_count(this);
-}
-
-void QRCode_scan(QRCode this) {
-    int count = QRCode_count(this);
-    for (int index = 0; index < count; index++) {
-        struct quirc_code code;
-        quirc_extract(this, index, &code);
-
-        struct quirc_data data;
-        quirc_decode_error_t error = quirc_decode(&code, &data);
-
-        if (error == QUIRC_ERROR_DATA_ECC) {
-            quirc_flip(&code);
-            error = quirc_decode(&code, &data);
-        }
-
-        if (!error) {
-            printf("%s\n", data.payload);
-        } else {
-            panic("%s\n", quirc_strerror(error));
-        }
-    }
-}
-
-int main(int argc, String argv[]) {
-    Options options = options_new(argc, argv);
-
-    Image image = Image_new(options->filename);
-    QRCode qrcode = QRCode_new(image);
-    QRCode_scan(qrcode);
-
-    QRCode_delete(qrcode);
+    qrcode_delete(qrcode);
     Image_delete(image);
     options_delete(options);
 

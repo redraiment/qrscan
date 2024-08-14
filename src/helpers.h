@@ -12,6 +12,8 @@
     exit(EXIT_FAILURE); \
   } while(0)
 
+typedef unsigned char* ByteArray;
 typedef char* String;
+typedef FILE* File;
 
 #endif //QRSCAN_TYPINGS_H

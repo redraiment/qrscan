@@ -49,7 +49,7 @@ static void options_version() {
 Options options_new(int argc, String argv[]) {
     Options this = (Options) malloc(sizeof (struct _Options));
     if (this == NULL) {
-        panic("Alloc Options failed");
+        panic("Allocate Options failed");
     } else {
         this->show_help = false;
         this->show_version = false;

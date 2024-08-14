@@ -12,7 +12,7 @@ typedef struct _Options {
     String filename;
 } * Options;
 
-extern Options options_new(int argc, String argv[]);
-extern void options_delete(Options this);
+Options options_new(int argc, String argv[]);
+void options_delete(Options this);
 
 #endif //QRSCAN_OPTIONS_H
