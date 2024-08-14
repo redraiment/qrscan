@@ -36,14 +36,16 @@ TARGET = qrscan
 OS := $(shell uname -s)
 ifeq ($(OS),Darwin)
 	GROUP = staff
+  LDFLAGS =
 else
 	GROUP = root
+  LDFLAGS = -static
 endif
 
 .PHONY: all install uninstall clean
 
 all: $(OBJS)
-	$(CC) $^ $(LIBS) -static $(shell $(PKG_CONFIG) --libs --static libpng libjpeg) -lm -O2 -Wall -fPIC -o $(TARGET)
+	$(CC) $^ $(LIBS) $(LDFLAGS) $(shell $(PKG_CONFIG) --libs --static libpng libjpeg) -lm -O2 -Wall -fPIC -o $(TARGET)
 
 .c.o:
 	$(CC) $< $(CFLAGS) $(shell $(PKG_CONFIG) --cflags --static libpng libjpeg) -c -I$(QUIRC) -o $@
