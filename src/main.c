@@ -57,7 +57,7 @@ Image Image_new(String filename) {
     png_set_palette_to_rgb(this->png);
   }
   if (color_type | PNG_COLOR_MASK_COLOR) {
-    png_set_rgb_to_gray(this->png, PNG_ERROR_ACTION_ERROR, PNG_RGB_TO_GRAY_RED_COEFFICIENT, PNG_RGB_TO_GRAY_GREEN_COEFFICIENT);
+    png_set_rgb_to_gray(this->png, PNG_ERROR_ACTION_NONE, PNG_RGB_TO_GRAY_RED_COEFFICIENT, PNG_RGB_TO_GRAY_GREEN_COEFFICIENT);
   }
   if (bit_depth != 8) {
     png_set_expand_gray_1_2_4_to_8(this->png);
