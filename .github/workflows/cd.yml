@@ -1,0 +1,96 @@
+name: Continuous Deployment
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  publish-github:
+    name: Publish on GitHub
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        build: [linux-gnu, linux-musl, macos]
+        include:
+          - BUILD: linux-gnu
+            OS: ubuntu-latest
+            TOOLCHAIN: stable
+            TARGET: x86_64-unknown-linux-gnu
+
+          - BUILD: linux-musl
+            OS: ubuntu-latest
+            TOOLCHAIN: stable
+            TARGET: x86_64-unknown-linux-musl
+
+          - BUILD: macos
+            OS: macos-latest
+            TOOLCHAIN: stable
+            TARGET: x86_64-apple-darwin
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set the release version
+        shell: bash
+        run: |
+          echo "RELEASE_VERSION=${GITHUB_REF:11}" >> $GITHUB_ENV
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y pkg-config libpng-dev libjpeg-dev
+
+      - name: Install musl-tools
+        if: matrix.TARGET == 'x86_64-unknown-linux-musl'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            --allow-unauthenticated musl-tools
+
+      - name: Prepare release assets
+        shell: bash
+        run: |
+          mkdir -p release/
+          cp {LICENSE,README.md} release/
+          strip qrscan
+          cp qrscan release/
+          mv release/ qrscan-${{ env.RELEASE_VERSION }}/
+
+      - name: Create release artifacts
+        shell: bash
+        run: |
+            tar -czvf qrscan-${{ env.RELEASE_VERSION }}-${{ matrix.TARGET }}.tar.gz \
+              qrscan-${{ env.RELEASE_VERSION }}/
+            shasum -a 512 qrscan-${{ env.RELEASE_VERSION }}-${{ matrix.TARGET }}.tar.gz \
+              > qrscan-${{ env.RELEASE_VERSION }}-${{ matrix.TARGET }}.tar.gz.sha512
+
+      - name: Install gpg secret key
+        run: |
+          cat <(echo -e "${{ secrets.GPG_SECRET }}") | gpg --batch --import
+          gpg --list-secret-keys --keyid-format LONG
+
+      - name: Signing archive with GPG
+        run: |
+          git archive -o qrscan-${{ env.RELEASE_VERSION }}.tar.gz --format tar.gz --prefix "qrscan-${{ env.RELEASE_VERSION }}/" "v${{ env.RELEASE_VERSION }}"
+          cat <(echo "${{ secrets.GPG_PASS }}") | gpg --pinentry-mode loopback --passphrase-fd 0 --detach-sign --armor "qrscan-${{ env.RELEASE_VERSION }}.tar.gz"
+          mv "qrscan-${{ env.RELEASE_VERSION }}.tar.gz.asc" "source.tar.gz.asc"
+
+      - name: Upload the release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: qrscan-${{ env.RELEASE_VERSION }}-${{ matrix.TARGET }}*
+          file_glob: true
+          overwrite: true
+          tag: ${{ github.ref }}
+          release_name: "Release v${{ env.RELEASE_VERSION }}"
+
+      - name: Releasing GPG signature
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            source.tar.gz.asc
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
