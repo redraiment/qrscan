@@ -3,12 +3,10 @@
 
 CC ?= gcc
 PREFIX ?= /usr/local
+CFLAGS ?=
+LDFLAGS ?=
 
 QUIRC = quirc/lib
-
-CFLAGS ?= -c -I$(QUIRC)
-LDFLAGS ?= -lpng -lm -O2 -Wall -fPIC
-
 OBJS = \
 	$(QUIRC)/decode.o \
 	$(QUIRC)/identify.o \
@@ -20,10 +18,10 @@ TARGET = qrscan
 .PHONY: all install uninstall clean
 
 all: $(OBJS)
-	$(CC) $^ $(LDFLAGS) -o $(TARGET)
+	$(CC) $^ $(LDFLAGS) -lpng -lm -O2 -Wall -fPIC -o $(TARGET)
 
 .c.o:
-	$(CC) $< $(CFLAGS) -o $@
+	$(CC) $< $(CFLAGS) -c -I$(QUIRC) -o $@
 
 install:
 	install -o root -g root -m 0755 $(TARGET) $(PREFIX)/bin
