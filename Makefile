@@ -15,6 +15,13 @@ OBJS = \
 	src/main.o
 TARGET = qrscan
 
+OS := $(shell uname -s)
+ifeq ($(OS),Darwin)
+	GROUP = staff
+else
+	GROUP = root
+endif
+
 .PHONY: all install uninstall clean
 
 all: $(OBJS)
@@ -23,12 +30,12 @@ all: $(OBJS)
 .c.o:
 	$(CC) $< $(CFLAGS) -c -I$(QUIRC) -o $@
 
-install:
-	install -o root -g root -m 0755 $(TARGET) $(PREFIX)/bin
+install: all
+	install -o root -g $(GROUP) -m 0755 $(TARGET) $(PREFIX)/bin
 
 uninstall:
 	rm -f $(PREFIX)/bin/$(TARGET)
 
 clean:
 	rm -f $(OBJS)
-	rm -f qrscan
+	rm -f $(TARGET)
