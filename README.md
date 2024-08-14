@@ -12,11 +12,11 @@ make
 sudo make install
 ```
 
-This requires: pkg-config, libpng.
+This requires: pkg-config, libpng, libjpeg.
 
 ## Usage
 
-Scan a given image file
+Scan a given image file (possible format: png, jpg)
 
 ```sh
 qrscan path/to/file

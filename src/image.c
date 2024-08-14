@@ -4,6 +4,7 @@
 #include "helpers.h"
 #include "image.h"
 #include "png_reader.h"
+#include "jpg_reader.h"
 
 Image image_new(String filename, ImageFormat format) {
     Image image = (Image) malloc(sizeof (struct _Image));
@@ -21,8 +22,12 @@ Image image_new(String filename, ImageFormat format) {
             image->height = reader->height;
             image->reader = reader;
         } break;
-        case IMAGE_FORMAT_JPG:
-            break;
+        case IMAGE_FORMAT_JPG:{
+            JpgReader reader =  jpg_reader_new(image->file);
+            image->width = reader->width;
+            image->height = reader->height;
+            image->reader = reader;
+        } break;
     }
 
     return image;
@@ -35,6 +40,7 @@ void image_delete(Image this) {
                 png_reader_delete((PngReader) this->reader);
                 break;
             case IMAGE_FORMAT_JPG:
+                jpg_reader_delete((JpgReader) this->reader);
                 break;
         }
         fclose(this->file);
@@ -48,6 +54,7 @@ void image_read(Image this, ByteArray buffer) {
             png_reader_read((PngReader) this->reader, buffer);
             break;
         case IMAGE_FORMAT_JPG:
+            jpg_reader_read((JpgReader) this->reader, buffer);
             break;
     }
 }

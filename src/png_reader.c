@@ -46,9 +46,9 @@ void png_reader_delete(PngReader this) {
     }
 }
 
-void png_reader_read(PngReader reader, ByteArray buffer) {
-    for (int y = 0; y < reader->height; y++) {
-        reader->pointers[y] = buffer + y * reader->width;
+void png_reader_read(PngReader this, ByteArray buffer) {
+    for (int y = 0; y < this->height; y++) {
+        this->pointers[y] = buffer + y * this->width;
     }
-    png_read_image(reader->png, reader->pointers);
+    png_read_image(this->png, this->pointers);
 }

@@ -15,6 +15,6 @@ typedef struct _PngReader {
 
 PngReader png_reader_new(File file);
 void png_reader_delete(PngReader this);
-void png_reader_read(PngReader reader, ByteArray buffer);
+void png_reader_read(PngReader this, ByteArray buffer);
 
 #endif //QRSCAN_PNG_READER_H
