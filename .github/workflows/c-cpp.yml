@@ -20,3 +20,15 @@ jobs:
         sudo apt-get install --no-install-recommends -y pkg-config libpng-dev libjpeg-dev
     - name: make
       run: make
+  MacOS:
+    name: MacOS Release
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    - name: prepare
+      run: |
+        brew install pkg-config libpng jpeg
+    - name: make
+      run: make
