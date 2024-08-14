@@ -46,8 +46,10 @@ jobs:
         if: matrix.TARGET == 'x86_64-unknown-linux-musl'
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            --allow-unauthenticated musl-tools
+          sudo apt-get install -y --no-install-recommends --allow-unauthenticated musl-tools
+
+      - name: Build
+        run: make
 
       - name: Prepare release assets
         shell: bash
