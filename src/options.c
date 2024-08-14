@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "options.h"
 
@@ -22,6 +23,10 @@ static void options_help() {
     printf("Image Options:\n");
     printf("  --png, --jpg\n");
     printf("    The format of the input file, inferred from the extension by default\n");
+    printf("  -c, --count\n");
+    printf("    Suppress normal output, instead print a count of QR-Code\n");
+    printf("  -n, --index NUM\n");
+    printf("    Output the NUM QR-Code value only\n");
     printf("\n");
 
     printf("Options:\n");
@@ -53,28 +58,45 @@ Options options_new(int argc, String argv[]) {
     } else {
         this->show_help = false;
         this->show_version = false;
+        this->show_count = false;
         this->is_png_format = false;
         this->is_jpg_format = false;
+        this->index = 0;
         this->filename = NULL;
     }
 
     for (int index = 1; index < argc; index++) {
-        if (strcmp("-h", argv[index]) == 0 || strcmp("--help", argv[index]) == 0) {
+        String argument = argv[index];
+        int length = strlen(argument);
+        if (strcmp("-h", argument) == 0 || strcmp("--help", argument) == 0) {
             this->show_help = true;
             break;
-        } else if (strcmp("-v", argv[index]) == 0 || strcmp("--version", argv[index]) == 0) {
+        } else if (strcmp("-v", argument) == 0 || strcmp("--version", argument) == 0) {
             this->show_version = true;
             break;
-        } else if (strcmp("--png", argv[index]) == 0) {
+        } else if (strcmp("-c", argument) == 0 || strcmp("--count", argument) == 0) {
+            this->show_count = true;
+        } else if (strcmp("--png", argument) == 0) {
             this->is_png_format = true;
             this->is_jpg_format = false;
-        } else if (strcmp("--jpg", argv[index]) == 0) {
+        } else if (strcmp("--jpg", argument) == 0) {
             this->is_png_format = false;
             this->is_jpg_format = true;
-        } else if (strcmp("-", argv[index]) == 0 || (argv[index][0] != 0 && argv[index][0] != '-')) {
-            this->filename = argv[index];
+        } else if (strcmp("-n", argument) == 0 || strcmp("--index", argument) == 0) {
+            index++;
+            if (index < argc) {
+                this->index = atoi(argv[index]);
+            } else {
+                panic("Option %s requires a number argument\n", argument);
+            }
+        } else if (length > 2 && strncmp("-n", argument, 2) == 0) { // -nNNN
+            this->index = atoi(argument + 2);
+        } else if (length > 1 && argument[0] == '-' && isdigit(argument[1])) { // -NNN
+            this->index = atoi(argument + 1);
+        } else if (strcmp("-", argument) == 0 || (length > 0 && argument[0] != '-')) {
+            this->filename = argument;
         } else {
-            panic("Unknown argument: %s\n", argv[index]);
+            panic("Unknown argument: %s\n", argument);
         }
     }
 

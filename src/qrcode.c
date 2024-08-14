@@ -20,10 +20,22 @@ ByteArray qrcode_alloc(QRCode this, int width, int height) {
     return quirc_begin(this, NULL, NULL);
 }
 
-void qrcode_scan(QRCode this) {
+int qrcode_count(QRCode this) {
+    quirc_end(this);
+    return quirc_count(this);
+}
+
+void qrcode_scan(QRCode this, int index) {
     quirc_end(this);
     int count = quirc_count(this);
-    for (int index = 0; index < count; index++) {
+    if (1 <= index && index <= count) {
+        count = index;
+        index--;
+    } else if (index != 0) {
+        panic("Option index(%d) out of bound [1, %d]\n", index, count);
+    }
+
+    for (; index < count; index++) {
         struct quirc_code code;
         quirc_extract(this, index, &code);
 

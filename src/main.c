@@ -10,7 +10,11 @@ int main(int argc, String argv[]) {
 
     ByteArray buffer = qrcode_alloc(qrcode, image->width, image->height);
     image_read(image, buffer);
-    qrcode_scan(qrcode);
+    if (options->show_count) {
+        printf("%d\n", qrcode_count(qrcode));
+    } else {
+        qrcode_scan(qrcode, options->index);
+    }
 
     image_delete(image);
     qrcode_delete(qrcode);

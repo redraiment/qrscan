@@ -8,6 +8,7 @@ typedef struct quirc* QRCode;
 QRCode qrcode_new();
 void qrcode_delete(QRCode this);
 ByteArray qrcode_alloc(QRCode this, int width, int height);
-void qrcode_scan(QRCode this);
+int qrcode_count(QRCode this);
+void qrcode_scan(QRCode this, int index);
 
 #endif //QRSCAN_QRCODE_H

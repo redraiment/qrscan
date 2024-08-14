@@ -7,8 +7,10 @@
 typedef struct _Options {
     bool show_help;
     bool show_version;
+    bool show_count;
     bool is_png_format;
     bool is_jpg_format;
+    int index;
     String filename;
 } * Options;
 
