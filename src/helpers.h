@@ -12,6 +12,7 @@
     exit(EXIT_FAILURE); \
   } while(0)
 
+typedef void* Any;
 typedef unsigned char* ByteArray;
 typedef char* String;
 typedef FILE* File;

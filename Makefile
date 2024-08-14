@@ -23,7 +23,9 @@ OBJS = \
 	$(QUIRC)/version_db.o \
 	src/main.o \
 	src/options.o \
-	src/qrcode.o
+	src/qrcode.o \
+	src/png_reader.o \
+	src/image.o
 TARGET = qrscan
 
 OS := $(shell uname -s)
