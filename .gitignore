@@ -1,3 +1,10 @@
+# IDE
+/.idea
+
 # Build
 *.o
 qrscan
+
+# Testing
+*.png
+*.jpg

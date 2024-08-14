@@ -21,7 +21,8 @@ OBJS = \
 	$(QUIRC)/identify.o \
 	$(QUIRC)/quirc.o \
 	$(QUIRC)/version_db.o \
-	src/main.o
+	src/main.o \
+	src/options.o
 TARGET = qrscan
 
 OS := $(shell uname -s)
