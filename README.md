@@ -12,7 +12,7 @@ make
 sudo make install
 ```
 
-This requires: libpng
+This requires: pkg-config, libpng.
 
 ## Usage
 
