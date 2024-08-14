@@ -43,10 +43,10 @@ endif
 .PHONY: all install uninstall clean
 
 all: $(OBJS)
-	$(CC) $^ $(LIBS) $(shell $(PKG_CONFIG) --libs libpng libjpeg) -lm -O2 -Wall -fPIC -o $(TARGET)
+	$(CC) $^ $(LIBS) -static $(shell $(PKG_CONFIG) --libs --static libpng libjpeg) -lm -O2 -Wall -fPIC -o $(TARGET)
 
 .c.o:
-	$(CC) $< $(CFLAGS) $(shell $(PKG_CONFIG) --cflags libpng libjpeg) -c -I$(QUIRC) -o $@
+	$(CC) $< $(CFLAGS) $(shell $(PKG_CONFIG) --cflags --static libpng libjpeg) -c -I$(QUIRC) -o $@
 
 install: all
 	install -o root -g $(GROUP) -m 0755 $(TARGET) $(PREFIX)/bin
