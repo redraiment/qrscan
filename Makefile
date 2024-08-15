@@ -16,8 +16,6 @@ endif
 
 CC ?= gcc
 PREFIX ?= /usr/local
-CFLAGS ?=
-LIBS ?=
 
 QUIRC = quirc/lib
 OBJS = \
@@ -33,22 +31,24 @@ OBJS = \
 	src/jpg_reader.o
 TARGET = qrscan
 
-OS := $(shell uname -s)
-ifeq ($(OS),Darwin)
+CFLAGS += -I$(QUIRC) $(shell $(PKG_CONFIG) --cflags --static libpng libjpeg)
+LDFLAGS += -lz -lm
+ifeq ($(shell uname -s),Darwin)
 	GROUP = staff
-  LDFLAGS =
+  LDFLAGS += $(shell $(PKG_CONFIG) --variable=libdir --static libpng)/libpng.a
+  LDFLAGS += $(shell $(PKG_CONFIG) --variable=libdir --static libjpeg)/libjpeg.a
 else
 	GROUP = root
-  LDFLAGS = -static
+  LDFLAGS += -static $(shell $(PKG_CONFIG) --libs --static libpng libjpeg)
 endif
 
 .PHONY: all install uninstall clean
 
 all: $(OBJS)
-	$(CC) $^ $(LIBS) $(LDFLAGS) $(shell $(PKG_CONFIG) --libs --static libpng libjpeg) -lm -O2 -Wall -fPIC -o $(TARGET)
+	$(CC) $^ $(LDFLAGS) -O2 -Wall -fPIC -o $(TARGET)
 
 .c.o:
-	$(CC) $< $(CFLAGS) $(shell $(PKG_CONFIG) --cflags --static libpng libjpeg) -c -I$(QUIRC) -o $@
+	$(CC) $< $(CFLAGS) -c -o $@
 
 install: all
 	install -o root -g $(GROUP) -m 0755 $(TARGET) $(PREFIX)/bin

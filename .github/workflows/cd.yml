@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        build: [linux-gnu, linux-musl, macos]
+        build: [linux-gnu, linux-musl, macos-arm64, macos-x86_64]
         include:
           - BUILD: linux-gnu
             OS: ubuntu-latest
@@ -24,8 +24,13 @@ jobs:
             TOOLCHAIN: stable
             TARGET: x86_64-unknown-linux-musl
 
-          - BUILD: macos
+          - BUILD: macos-arm64
             OS: macos-latest
+            TOOLCHAIN: stable
+            TARGET: arm64-apple-darwin
+
+          - BUILD: macos-x86_64
+            OS: macos-13
             TOOLCHAIN: stable
             TARGET: x86_64-apple-darwin
 
@@ -39,17 +44,19 @@ jobs:
         shell: bash
         run: echo "RELEASE_VERSION=${GITHUB_REF:11}" >> $GITHUB_ENV
 
-      - name: Install libraries
+      - name: Install Linux libraries
         if: matrix.TARGET == 'x86_64-unknown-linux-gnu' || matrix.TARGET == 'x86_64-unknown-linux-musl'
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -y pkg-config libpng-dev libjpeg-dev
+          sudo apt-get install --no-install-recommends -y \
+               pkg-config libpng-dev libjpeg-dev
 
-      - name: Install musl-tools
+      - name: Install Linux musl-tools
         if: matrix.TARGET == 'x86_64-unknown-linux-musl'
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends --allow-unauthenticated musl-tools
+          sudo apt-get install -y --no-install-recommends \
+               --allow-unauthenticated musl-tools
 
       - name: Build
         run: make
