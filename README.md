@@ -1,7 +1,7 @@
 qrscan
 ====
 
-![Continuous Integration](https://github.com/redraiment/qrcode/actions/workflows/ci.yml/badge.svg) ![Continuous Deployment](https://github.com/redraiment/qrcode/actions/workflows/cd.yml/badge.svg)
+![Continuous Integration](https://github.com/redraiment/qrscan/actions/workflows/ci.yml/badge.svg) ![Continuous Deployment](https://github.com/redraiment/qrscan/actions/workflows/cd.yml/badge.svg)
 
 Scan a QR code in the terminal using a given (PNG or JPEG) image.
 
