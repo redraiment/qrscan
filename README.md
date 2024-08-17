@@ -5,6 +5,8 @@ qrscan
 
 Scan a QR code in the terminal using a given (PNG or JPEG) image.
 
+https://github.com/user-attachments/assets/0fb24adc-e993-40d4-9b0a-72cae1fcc0f4
+
 ## Install
 
 ### Pre-built binaries (Recommends)
